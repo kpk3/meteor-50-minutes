@@ -1,12 +1,13 @@
 /**
  * Created by junoa on 10/9/2016.
  */
-
 Tasks = new Mongo.Collection('tasks');
 
-if (Meteor.isClient){
+if (Meteor.isClient) {
+  Meteor.subscribe('tasks');
+
   Template.tasks.helpers({
-    tasks: function(){
+    tasks: function() {
       return Tasks.find({}, {sort: {createdAt: -1}});
     }
   });
@@ -18,17 +19,20 @@ if (Meteor.isClient){
       event.target.name.value = '';
       return false;
     },
+
     "click .delete-task": function(event) {
       if (confirm('Delete Task?')) {
         Meteor.call('deleteTask', this._id);
       }
       return false;
     }
-  });
+  })
 }
 
-if (Meteor.isServer){
-
+if (Meteor.isServer) {
+  Meteor.publish('tasks', function() {
+    return Tasks.find({userId: this.userId});
+  })
 }
 
 Meteor.methods({
